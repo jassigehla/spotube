@@ -1,19 +1,19 @@
 import 'package:drift/drift.dart';
-import 'package:flutter/material.dart';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart' as paths;
+import 'package:shadcn_flutter/shadcn_flutter.dart' hide join;
 import 'package:spotify/spotify.dart';
 import 'package:spotube/models/database/database.dart';
 import 'package:spotube/modules/settings/color_scheme_picker_dialog.dart';
-import 'package:spotube/provider/audio_player/audio_player_streams.dart';
 import 'package:spotube/provider/database/database.dart';
-import 'package:spotube/provider/palette_provider.dart';
-import 'package:spotube/provider/user_preferences/default_download_dir_provider.dart';
-import 'package:spotube/provider/window_manager/window_manager.dart';
 import 'package:spotube/services/audio_player/audio_player.dart';
 import 'package:spotube/services/logger/logger.dart';
 import 'package:spotube/services/sourced_track/enums.dart';
 import 'package:spotube/utils/platform.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:open_file/open_file.dart';
 
 typedef UserPreferences = PreferencesTableData;
 
@@ -69,6 +69,18 @@ class UserPreferencesNotifier extends Notifier<PreferencesTableData> {
     return PreferencesTable.defaults();
   }
 
+  Future<String> _getDefaultDownloadDirectory() async {
+    if (kIsAndroid) return "/storage/emulated/0/Download/Spotube";
+
+    if (kIsMacOS) {
+      return join((await paths.getLibraryDirectory()).path, "Caches");
+    }
+
+    return paths.getDownloadsDirectory().then((dir) {
+      return join(dir!.path, "Spotube");
+    });
+  }
+
   Future<void> setData(PreferencesTableCompanion data) async {
     final db = ref.read(databaseProvider);
 
@@ -80,13 +92,37 @@ class UserPreferencesNotifier extends Notifier<PreferencesTableData> {
   Future<void> reset() async {
     final db = ref.read(databaseProvider);
 
-    final query = db.update(db.preferencesTable)..where((t) => t.id.equals(0));
+    final query = db.update(db.preferencesTable);
 
-    await query.replace(PreferencesTableCompanion.insert());
+    await query.replace(PreferencesTableCompanion.insert(id: const Value(0)));
   }
 
-  Future<void> setStreamMusicCodec(SourceCodecs codec) async {
-    await setData(PreferencesTableCompanion(streamMusicCodec: Value(codec)));
+  static Future<String> getMusicCacheDir() async {
+    if (kIsAndroid) {
+      final dir =
+          await paths.getExternalCacheDirectories().then((dirs) => dirs!.first);
+      if (!await dir.exists()) {
+        await dir.create(recursive: true);
+      }
+      return join(dir.path, 'Cached Tracks');
+    }
+
+    final dir = await paths.getApplicationCacheDirectory();
+    return join(dir.path, 'cached_tracks');
+  }
+
+  Future<void> openCacheFolder() async {
+    try {
+      final filePath = await getMusicCacheDir();
+
+      await OpenFile.open(filePath);
+    } catch (e, stack) {
+      AppLogger.reportError(e, stack);
+    }
+  }
+
+  void setStreamMusicCodec(SourceCodecs codec) {
+    setData(PreferencesTableCompanion(streamMusicCodec: Value(codec)));
   }
 
   Future<void> setDownloadMusicCodec(SourceCodecs codec) async {
@@ -108,11 +144,11 @@ class UserPreferencesNotifier extends Notifier<PreferencesTableData> {
   Future<void> setAlbumColorSync(bool sync) async {
     await setData(PreferencesTableCompanion(albumColorSync: Value(sync)));
 
-    if (!sync) {
-      ref.read(paletteProvider.notifier).state = null;
-    } else {
-      ref.read(audioPlayerStreamListenersProvider).updatePalette();
-    }
+    // if (!sync) {
+    //   ref.read(paletteProvider.notifier).state = null;
+    // } else {
+    //   ref.read(audioPlayerStreamListenersProvider).updatePalette();
+    // }
   }
 
   Future<void> setCheckUpdate(bool check) async {
@@ -173,8 +209,12 @@ class UserPreferencesNotifier extends Notifier<PreferencesTableData> {
     await setData(PreferencesTableCompanion(audioSource: Value(type)));
   }
 
-  Future<void> setSystemTitleBar(bool isSystemTitleBar) async {
-    await setData(
+  void setYoutubeClientEngine(YoutubeClientEngine engine) {
+    setData(PreferencesTableCompanion(youtubeClientEngine: Value(engine)));
+  }
+
+  void setSystemTitleBar(bool isSystemTitleBar) {
+    setData(
       PreferencesTableCompanion(
         systemTitleBar: Value(isSystemTitleBar),
       ),
@@ -199,8 +239,12 @@ class UserPreferencesNotifier extends Notifier<PreferencesTableData> {
     await setData(PreferencesTableCompanion(endlessPlayback: Value(endless)));
   }
 
-  Future<void> setEnableConnect(bool enable) async {
-    await setData(PreferencesTableCompanion(enableConnect: Value(enable)));
+  void setEnableConnect(bool enable) {
+    setData(PreferencesTableCompanion(enableConnect: Value(enable)));
+  }
+
+  void setCacheMusic(bool cache) {
+    setData(PreferencesTableCompanion(cacheMusic: Value(cache)));
   }
 }
 

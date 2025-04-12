@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:collection/collection.dart';
 import 'package:spotube/services/logger/logger.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -25,6 +24,9 @@ const supportedAudioTypes = [
   "audio/opus",
   "audio/wav",
   "audio/aac",
+  "audio/flac",
+  "audio/x-flac",
+  "audio/x-wav",
 ];
 
 const imgMimeToExt = {
@@ -44,14 +46,23 @@ final localTracksProvider =
       userPreferencesProvider.select((s) => s.downloadLocation),
     );
     final downloadDir = Directory(downloadLocation);
+    final cacheDir =
+        Directory(await UserPreferencesNotifier.getMusicCacheDir());
     if (!await downloadDir.exists()) {
       await downloadDir.create(recursive: true);
+    }
+    if (!await cacheDir.exists()) {
+      await cacheDir.create(recursive: true);
     }
     final localLibraryLocations = ref.watch(
       userPreferencesProvider.select((s) => s.localLibraryLocation),
     );
 
-    for (final location in [downloadLocation, ...localLibraryLocations]) {
+    for (final location in [
+      downloadLocation,
+      cacheDir.path,
+      ...localLibraryLocations
+    ]) {
       if (location.isEmpty) continue;
       final entities = <File>[];
       if (await Directory(location).exists()) {
@@ -60,13 +71,14 @@ final localTracksProvider =
               await Directory(location).list(recursive: true).toList();
 
           entities.addAll(
-            dirEntities
-                .where(
-                  (e) =>
-                      e is File &&
-                      supportedAudioTypes.contains(lookupMimeType(e.path)),
-                )
-                .cast<File>(),
+            dirEntities.where(
+              (e) {
+                final mime = lookupMimeType(e.path) ??
+                    (extension(e.path) == ".opus" ? "audio/opus" : null);
+
+                return e is File && supportedAudioTypes.contains(mime);
+              },
+            ).cast<File>(),
           );
         } catch (e, stack) {
           AppLogger.reportError(e, stack);
@@ -101,7 +113,7 @@ final localTracksProvider =
             return null;
           }
         }),
-      ).then((value) => value.whereNotNull().toList());
+      ).then((value) => value.nonNulls.toList());
 
       final tracksFromMetadata = filesWithMetadata
           .map(
