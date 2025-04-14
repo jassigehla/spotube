@@ -110,7 +110,7 @@ class GettingStartedScreenSupportSection extends HookConsumerWidget {
                 Button.secondary(
                   leading: const Icon(SpotubeIcons.anonymous),
                   onPressed: () async {
-                    await KVStoreService.setDoneGettingStarted(true);
+                    await KVStoreService().setDoneGettingStarted(true);
                     if (context.mounted) {
                       context.navigateTo(const HomeRoute());
                     }
@@ -134,7 +134,7 @@ class GettingStartedScreenSupportSection extends HookConsumerWidget {
                     },
                   ),
                   onPressed: () async {
-                    await KVStoreService.setDoneGettingStarted(true);
+                    await KVStoreService().setDoneGettingStarted(true);
                     await onLogin();
                   },
                   child: Text(

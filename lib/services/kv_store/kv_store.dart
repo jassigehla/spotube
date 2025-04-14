@@ -2,35 +2,37 @@ import 'dart:convert';
 
 import 'package:encrypt/encrypt.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/models/database/database.dart';
 import 'package:spotube/services/wm_tools/wm_tools.dart';
 import 'package:uuid/uuid.dart';
 
-abstract class KVStoreService {
-  static SharedPreferences? _sharedPreferences;
-  static SharedPreferences get sharedPreferences => _sharedPreferences!;
-
-  static Future<void> initialize() async {
-    _sharedPreferences = await SharedPreferences.getInstance();
+final class KVStoreService {
+  factory KVStoreService() {
+    return getIt<KVStoreService>();
   }
 
-  static bool get doneGettingStarted =>
+  KVStoreService.init();
+
+  SharedPreferences get sharedPreferences => getIt<SharedPreferences>();
+
+  bool get doneGettingStarted =>
       sharedPreferences.getBool('doneGettingStarted') ?? false;
-  static Future<void> setDoneGettingStarted(bool value) async =>
+  Future<void> setDoneGettingStarted(bool value) async =>
       await sharedPreferences.setBool('doneGettingStarted', value);
 
-  static bool get askedForBatteryOptimization =>
+  bool get askedForBatteryOptimization =>
       sharedPreferences.getBool('askedForBatteryOptimization') ?? false;
-  static Future<void> setAskedForBatteryOptimization(bool value) async =>
+  Future<void> setAskedForBatteryOptimization(bool value) async =>
       await sharedPreferences.setBool('askedForBatteryOptimization', value);
 
-  static List<String> get recentSearches =>
+  List<String> get recentSearches =>
       sharedPreferences.getStringList('recentSearches') ?? [];
 
-  static Future<void> setRecentSearches(List<String> value) async =>
+  Future<void> setRecentSearches(List<String> value) async =>
       await sharedPreferences.setStringList('recentSearches', value);
 
-  static WindowSize? get windowSize {
+  WindowSize? get windowSize {
     final raw = sharedPreferences.getString('windowSize');
 
     if (raw == null) {
@@ -39,7 +41,7 @@ abstract class KVStoreService {
     return WindowSize.fromJson(jsonDecode(raw));
   }
 
-  static Future<void> setWindowSize(WindowSize value) async =>
+  Future<void> setWindowSize(WindowSize value) async =>
       await sharedPreferences.setString(
         'windowSize',
         jsonEncode(
@@ -47,7 +49,7 @@ abstract class KVStoreService {
         ),
       );
 
-  static String get encryptionKey {
+  String get encryptionKey {
     final value = sharedPreferences.getString('encryption');
 
     final key = const Uuid().v4();
@@ -59,11 +61,11 @@ abstract class KVStoreService {
     return value;
   }
 
-  static Future<void> setEncryptionKey(String key) async {
+  Future<void> setEncryptionKey(String key) async {
     await sharedPreferences.setString('encryption', key);
   }
 
-  static IV get ivKey {
+  IV get ivKey {
     final iv = sharedPreferences.getString('iv');
     final value = IV.fromSecureRandom(8);
 
@@ -76,20 +78,20 @@ abstract class KVStoreService {
     return IV.fromBase64(iv);
   }
 
-  static Future<void> setIVKey(IV iv) async {
+  Future<void> setIVKey(IV iv) async {
     await sharedPreferences.setString('iv', iv.base64);
   }
 
-  static double get volume => sharedPreferences.getDouble('volume') ?? 1.0;
-  static Future<void> setVolume(double value) async =>
+  double get volume => sharedPreferences.getDouble('volume') ?? 1.0;
+  Future<void> setVolume(double value) async =>
       await sharedPreferences.setDouble('volume', value);
 
-  static bool get hasMigratedToDrift =>
+  bool get hasMigratedToDrift =>
       sharedPreferences.getBool('hasMigratedToDrift') ?? false;
-  static Future<void> setHasMigratedToDrift(bool value) async =>
+  Future<void> setHasMigratedToDrift(bool value) async =>
       await sharedPreferences.setBool('hasMigratedToDrift', value);
 
-  static Map<String, dynamic>? get _youtubeEnginePaths {
+  Map<String, dynamic>? get _youtubeEnginePaths {
     final jsonRaw = sharedPreferences.getString('ytDlpPath');
 
     if (jsonRaw == null) {
@@ -99,11 +101,11 @@ abstract class KVStoreService {
     return jsonDecode(jsonRaw);
   }
 
-  static String? getYoutubeEnginePath(YoutubeClientEngine engine) {
+  String? getYoutubeEnginePath(YoutubeClientEngine engine) {
     return _youtubeEnginePaths?[engine.name];
   }
 
-  static Future<void> setYoutubeEnginePath(
+  Future<void> setYoutubeEnginePath(
     YoutubeClientEngine engine,
     String path,
   ) async {

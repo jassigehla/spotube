@@ -47,7 +47,7 @@ class WindowManagerTools with WidgetsBindingObserver {
         center: true,
       ),
       () async {
-        final savedSize = KVStoreService.windowSize;
+        final savedSize = KVStoreService().windowSize;
         await windowManager.setResizable(true);
         if (savedSize?.maximized == true &&
             !(await windowManager.isMaximized())) {
@@ -77,7 +77,7 @@ class WindowManagerTools with WidgetsBindingObserver {
       return;
     }
     final isMaximized = await windowManager.isMaximized();
-    await KVStoreService.setWindowSize(
+    await KVStoreService().setWindowSize(
       WindowSize(
         height: size.height,
         width: size.width,

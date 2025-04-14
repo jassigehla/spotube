@@ -21,7 +21,7 @@ void useCheckYtDlpInstalled(WidgetRef ref) {
       );
 
       final customPath =
-          KVStoreService.getYoutubeEnginePath(YoutubeClientEngine.ytDlp);
+          KVStoreService().getYoutubeEnginePath(YoutubeClientEngine.ytDlp);
 
       if (youtubeEngine == YoutubeClientEngine.ytDlp &&
           !await YtDlpEngine.isInstalled() &&

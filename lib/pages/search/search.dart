@@ -62,10 +62,10 @@ class SearchPage extends HookConsumerWidget {
       if (value.trim().isEmpty) {
         return;
       }
-      KVStoreService.setRecentSearches(
+      KVStoreService().setRecentSearches(
         {
           value,
-          ...KVStoreService.recentSearches,
+          ...KVStoreService().recentSearches,
         }.toList(),
       );
     }
@@ -96,8 +96,9 @@ class SearchPage extends HookConsumerWidget {
                                 listenable: controller,
                                 builder: (context, _) {
                                   final suggestions = controller.text.isEmpty
-                                      ? KVStoreService.recentSearches
-                                      : KVStoreService.recentSearches
+                                      ? KVStoreService().recentSearches
+                                      : KVStoreService()
+                                          .recentSearches
                                           .where(
                                             (s) =>
                                                 weightedRatio(

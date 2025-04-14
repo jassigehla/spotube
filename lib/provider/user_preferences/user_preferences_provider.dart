@@ -8,6 +8,8 @@ import 'package:spotify/spotify.dart';
 import 'package:spotube/models/database/database.dart';
 import 'package:spotube/modules/settings/color_scheme_picker_dialog.dart';
 import 'package:spotube/provider/database/database.dart';
+import 'package:spotube/provider/user_preferences/default_download_dir_provider.dart';
+import 'package:spotube/provider/window_manager/window_manager.dart';
 import 'package:spotube/services/audio_player/audio_player.dart';
 import 'package:spotube/services/logger/logger.dart';
 import 'package:spotube/services/sourced_track/enums.dart';

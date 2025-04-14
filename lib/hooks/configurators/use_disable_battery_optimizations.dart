@@ -6,7 +6,7 @@ import 'package:spotube/utils/platform.dart';
 
 void useDisableBatteryOptimizations() {
   useAsyncEffect(() async {
-    if (!kIsAndroid || KVStoreService.askedForBatteryOptimization) return;
+    if (!kIsAndroid || KVStoreService().askedForBatteryOptimization) return;
 
     await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
 
@@ -16,6 +16,6 @@ void useDisableBatteryOptimizations() {
       "Follow the steps and disable the optimizations to allow smooth functioning of this app",
     );
 
-    await KVStoreService.setAskedForBatteryOptimization(true);
+    await KVStoreService().setAskedForBatteryOptimization(true);
   }, null, []);
 }

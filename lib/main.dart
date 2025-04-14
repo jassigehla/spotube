@@ -8,12 +8,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_discord_rpc/flutter_discord_rpc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:get_it/get_it.dart';
 
 import 'package:home_widget/home_widget.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:local_notifier/local_notifier.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:metadata_god/metadata_god.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smtc_windows/smtc_windows.dart';
 import 'package:spotube/collections/env.dart';
 import 'package:spotube/collections/initializers.dart';
@@ -65,6 +67,14 @@ Future<void> main(List<String> rawArgs) async {
   AppLogger.runZoned(() async {
     final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
+    GetIt.I.registerSingleton<SharedPreferences>(
+      await SharedPreferences.getInstance(),
+    );
+    GetIt.I.registerSingletonWithDependencies<KVStoreService>(
+      () => KVStoreService.init(),
+      dependsOn: [SharedPreferences],
+    );
+
     await registerWindowsScheme("spotify");
 
     tz.initializeTimeZones();
@@ -85,13 +95,11 @@ Future<void> main(List<String> rawArgs) async {
       MetadataGod.initialize();
     }
 
-    await KVStoreService.initialize();
-
     if (kIsDesktop) {
       await windowManager.setPreventClose(true);
       await YtDlp.instance
           .setBinaryLocation(
-            KVStoreService.getYoutubeEnginePath(YoutubeClientEngine.ytDlp) ??
+            KVStoreService().getYoutubeEnginePath(YoutubeClientEngine.ytDlp) ??
                 "yt-dlp${kIsWindows ? '.exe' : ''}",
           )
           .catchError((e, stack) => null);
