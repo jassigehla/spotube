@@ -21,6 +21,7 @@ import 'package:spotube/collections/env.dart';
 import 'package:spotube/collections/initializers.dart';
 import 'package:spotube/collections/intents.dart';
 import 'package:spotube/collections/routes.dart';
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/hooks/configurators/use_close_behavior.dart';
 import 'package:spotube/hooks/configurators/use_deep_linking.dart';
 import 'package:spotube/hooks/configurators/use_disable_battery_optimizations.dart';
@@ -67,13 +68,12 @@ Future<void> main(List<String> rawArgs) async {
   AppLogger.runZoned(() async {
     final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
-    GetIt.I.registerSingleton<SharedPreferences>(
-      await SharedPreferences.getInstance(),
-    );
-    GetIt.I.registerSingletonWithDependencies<KVStoreService>(
+    getIt.registerSingleton(await SharedPreferences.getInstance());
+    getIt.registerSingletonWithDependencies(
       () => KVStoreService.init(),
       dependsOn: [SharedPreferences],
     );
+    getIt.registerSingleton(SpotubeAudioPlayer());
 
     await registerWindowsScheme("spotify");
 

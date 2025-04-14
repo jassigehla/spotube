@@ -7,9 +7,9 @@ import 'package:spotube/models/database/database.dart';
 import 'package:spotube/services/wm_tools/wm_tools.dart';
 import 'package:uuid/uuid.dart';
 
-final class KVStoreService {
+class KVStoreService {
   factory KVStoreService() {
-    return getIt<KVStoreService>();
+    return getIt.get<KVStoreService>();
   }
 
   KVStoreService.init();

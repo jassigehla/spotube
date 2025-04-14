@@ -1,6 +1,8 @@
 part of 'audio_player.dart';
 
-final audioPlayer = SpotubeAudioPlayer();
+SpotubeAudioPlayer get audioPlayer {
+  return getIt.get<SpotubeAudioPlayer>();
+}
 
 class SpotubeAudioPlayer extends AudioPlayerInterface
     with SpotubeAudioPlayersStreams {
