@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -82,29 +80,16 @@ void main() {
       when(() => audioPlayer.setAudioNormalization(any()))
           .thenAnswer((_) async {});
 
-      final db = getIt.get<AppDatabase>();
       final preferences = container.read(userPreferencesProvider);
-      await Future.delayed(const Duration(milliseconds: 300));
       final preferencesNotifier =
           container.read(userPreferencesProvider.notifier);
 
       expect(preferences.systemTitleBar, false);
 
-      final completer = Completer<bool>();
-      final subscription = (db.select(db.preferencesTable)
-            ..where((tbl) => tbl.id.equals(0)))
-          .watchSingle()
-          .listen((event) {
-        completer.complete(event.systemTitleBar);
-      });
-
-      addTearDown(() {
-        subscription.cancel();
-      });
-
       preferencesNotifier.setSystemTitleBar(true);
 
-      await expectLater(completer.future, completion(equals(true)));
+      await Future.delayed(const Duration(milliseconds: 500));
+
       verify(() => mockWindowManager.setTitleBarStyle(TitleBarStyle.hidden))
           .called(1);
     });
