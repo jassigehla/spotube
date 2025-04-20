@@ -1,11 +1,12 @@
 import 'dart:io';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/provider/audio_player/audio_player.dart';
-import 'package:spotube/provider/window_manager/window_manager.dart';
 import 'package:spotube/services/audio_player/audio_player.dart';
 import 'package:media_kit/media_kit.dart' hide Track;
 import 'package:tray_manager/tray_manager.dart';
+import 'package:window_manager/window_manager.dart';
 
 final audioPlayerLoopMode = StreamProvider<PlaylistMode>((ref) {
   return audioPlayer.loopModeStream;
@@ -19,7 +20,7 @@ final audioPlayerPlaying = StreamProvider<bool>((ref) {
 });
 
 final trayMenuProvider = Provider((ref) {
-  final windowManager = ref.watch(windowManagerProvider);
+  final windowManager = getIt.get<WindowManager>();
 
   final playlistNotifier = ref.watch(audioPlayerProvider.notifier);
   final isPlaybackPlaying =

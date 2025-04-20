@@ -20,13 +20,13 @@ void main() {
     // These simple tests verify all possible schema updates with a simple (no
     // data) migration. This is a quick way to ensure that written database
     // migrations properly alter the schema.
-    final versions = GeneratedHelper.versions;
+    const versions = GeneratedHelper.versions;
     for (final (i, fromVersion) in versions.indexed) {
       group('from $fromVersion', () {
         for (final toVersion in versions.skip(i + 1)) {
           test('to $toVersion', () async {
             final schema = await verifier.schemaAt(fromVersion);
-            final db = Database(schema.newConnection());
+            final db = AppDatabase(schema.newConnection());
             await verifier.migrateAndValidate(db, toVersion);
             await db.close();
           });

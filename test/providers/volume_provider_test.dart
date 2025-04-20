@@ -6,9 +6,7 @@ import 'package:spotube/provider/volume_provider.dart';
 import 'package:spotube/services/audio_player/audio_player.dart';
 import 'package:spotube/services/kv_store/kv_store.dart';
 
-class MockSpotubeAudioPlayer extends Mock implements SpotubeAudioPlayer {}
-
-class MockKVStoreService extends Mock implements KVStoreService {}
+import 'mocks/mocks.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

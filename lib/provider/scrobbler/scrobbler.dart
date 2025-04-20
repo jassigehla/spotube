@@ -5,24 +5,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scrobblenaut/scrobblenaut.dart';
 import 'package:spotify/spotify.dart';
 import 'package:spotube/collections/env.dart';
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/extensions/artist_simple.dart';
 import 'package:spotube/models/database/database.dart';
-import 'package:spotube/provider/database/database.dart';
 import 'package:spotube/services/logger/logger.dart';
 
 class ScrobblerNotifier extends AsyncNotifier<Scrobblenaut?> {
   final StreamController<Track> _scrobbleController =
       StreamController<Track>.broadcast();
+  AppDatabase get db => getIt.get<AppDatabase>();
+
   @override
   build() async {
-    final database = ref.watch(databaseProvider);
-
-    final loginInfo = await (database.select(database.scrobblerTable)
+    final loginInfo = await (db.select(db.scrobblerTable)
           ..where((t) => t.id.equals(0)))
         .getSingleOrNull();
 
     final subscription =
-        database.select(database.scrobblerTable).watch().listen((event) async {
+        db.select(db.scrobblerTable).watch().listen((event) async {
       try {
         if (event.isNotEmpty) {
           state = await AsyncValue.guard(
@@ -83,8 +83,6 @@ class ScrobblerNotifier extends AsyncNotifier<Scrobblenaut?> {
     String username,
     String password,
   ) async {
-    final database = ref.read(databaseProvider);
-
     final lastFm = await LastFM.authenticate(
       apiKey: Env.lastFmApiKey,
       apiSecret: Env.lastFmApiSecret,
@@ -94,7 +92,7 @@ class ScrobblerNotifier extends AsyncNotifier<Scrobblenaut?> {
 
     if (!lastFm.isAuth) throw Exception("Invalid credentials");
 
-    await database.into(database.scrobblerTable).insert(
+    await db.into(db.scrobblerTable).insert(
           ScrobblerTableCompanion.insert(
             id: const Value(0),
             username: username,
@@ -105,8 +103,8 @@ class ScrobblerNotifier extends AsyncNotifier<Scrobblenaut?> {
 
   Future<void> logout() async {
     state = const AsyncValue.data(null);
-    final database = ref.read(databaseProvider);
-    await database.delete(database.scrobblerTable).go();
+
+    await db.delete(db.scrobblerTable).go();
   }
 
   void scrobble(Track track) {

@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_discord_rpc/flutter_discord_rpc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:get_it/get_it.dart';
 
 import 'package:home_widget/home_widget.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -31,7 +30,6 @@ import 'package:spotube/hooks/configurators/use_has_touch.dart';
 import 'package:spotube/models/database/database.dart';
 import 'package:spotube/modules/settings/color_scheme_picker_dialog.dart';
 import 'package:spotube/provider/audio_player/audio_player_streams.dart';
-import 'package:spotube/provider/database/database.dart';
 import 'package:spotube/provider/glance/glance.dart';
 import 'package:spotube/provider/server/bonsoir.dart';
 import 'package:spotube/provider/server/server.dart';
@@ -73,7 +71,9 @@ Future<void> main(List<String> rawArgs) async {
       () => KVStoreService.init(),
       dependsOn: [SharedPreferences],
     );
+    getIt.registerLazySingleton<AppDatabase>(() => AppDatabase());
     getIt.registerSingleton(SpotubeAudioPlayer());
+    getIt.registerSingleton<WindowManager>(windowManager);
 
     await registerWindowsScheme("spotify");
 
@@ -112,8 +112,6 @@ Future<void> main(List<String> rawArgs) async {
 
     await EncryptedKvStoreService.initialize();
 
-    final database = AppDatabase();
-
     if (kIsDesktop) {
       await localNotifier.setup(appName: "Spotube");
       await WindowManagerTools.initialize();
@@ -124,14 +122,11 @@ Future<void> main(List<String> rawArgs) async {
     }
 
     runApp(
-      ProviderScope(
-        overrides: [
-          databaseProvider.overrideWith((ref) => database),
-        ],
-        observers: const [
+      const ProviderScope(
+        observers: [
           AppLoggerProviderObserver(),
         ],
-        child: const Spotube(),
+        child: Spotube(),
       ),
     );
   });

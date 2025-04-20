@@ -1,9 +1,10 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/provider/tray_manager/tray_menu.dart';
 import 'package:spotube/provider/user_preferences/user_preferences_provider.dart';
-import 'package:spotube/provider/window_manager/window_manager.dart';
 import 'package:spotube/utils/platform.dart';
 import 'package:tray_manager/tray_manager.dart';
+import 'package:window_manager/window_manager.dart';
 
 class SystemTrayManager with TrayListener {
   final Ref ref;
@@ -40,7 +41,7 @@ class SystemTrayManager with TrayListener {
   @override
   onTrayIconMouseDown() {
     if (kIsWindows) {
-      ref.read(windowManagerProvider).show();
+      getIt.get<WindowManager>().show();
     } else {
       trayManager.popUpContextMenu();
     }
@@ -49,7 +50,7 @@ class SystemTrayManager with TrayListener {
   @override
   onTrayIconRightMouseDown() {
     if (!kIsWindows) {
-      ref.read(windowManagerProvider).show();
+      getIt.get<WindowManager>().show();
     } else {
       trayManager.popUpContextMenu();
     }

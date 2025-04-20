@@ -1,4 +1,3 @@
-import 'package:mocktail/mocktail.dart';
-import 'package:window_manager/window_manager.dart';
+part of 'mocks.dart';
 
 class MockWindowManager extends Mock implements WindowManager {}

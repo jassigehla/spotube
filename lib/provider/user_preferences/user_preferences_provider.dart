@@ -5,11 +5,10 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart' as paths;
 import 'package:shadcn_flutter/shadcn_flutter.dart' hide join;
 import 'package:spotify/spotify.dart';
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/models/database/database.dart';
 import 'package:spotube/modules/settings/color_scheme_picker_dialog.dart';
-import 'package:spotube/provider/database/database.dart';
 import 'package:spotube/provider/user_preferences/default_download_dir_provider.dart';
-import 'package:spotube/provider/window_manager/window_manager.dart';
 import 'package:spotube/services/audio_player/audio_player.dart';
 import 'package:spotube/services/logger/logger.dart';
 import 'package:spotube/services/sourced_track/enums.dart';
@@ -20,10 +19,10 @@ import 'package:open_file/open_file.dart';
 typedef UserPreferences = PreferencesTableData;
 
 class UserPreferencesNotifier extends Notifier<PreferencesTableData> {
+  AppDatabase get db => getIt.get<AppDatabase>();
+
   @override
   build() {
-    final db = ref.watch(databaseProvider);
-
     (db.select(db.preferencesTable)..where((tbl) => tbl.id.equals(0)))
         .getSingleOrNull()
         .then((result) async {
@@ -50,7 +49,7 @@ class UserPreferencesNotifier extends Notifier<PreferencesTableData> {
           state = event;
 
           if (kIsDesktop) {
-            await ref.read(windowManagerProvider).setTitleBarStyle(
+            await getIt.get<WindowManager>().setTitleBarStyle(
                   state.systemTitleBar
                       ? TitleBarStyle.normal
                       : TitleBarStyle.hidden,
@@ -71,29 +70,25 @@ class UserPreferencesNotifier extends Notifier<PreferencesTableData> {
     return PreferencesTable.defaults();
   }
 
-  Future<String> _getDefaultDownloadDirectory() async {
-    if (kIsAndroid) return "/storage/emulated/0/Download/Spotube";
+  // Future<String> _getDefaultDownloadDirectory() async {
+  //   if (kIsAndroid) return "/storage/emulated/0/Download/Spotube";
 
-    if (kIsMacOS) {
-      return join((await paths.getLibraryDirectory()).path, "Caches");
-    }
+  //   if (kIsMacOS) {
+  //     return join((await paths.getLibraryDirectory()).path, "Caches");
+  //   }
 
-    return paths.getDownloadsDirectory().then((dir) {
-      return join(dir!.path, "Spotube");
-    });
-  }
+  //   return paths.getDownloadsDirectory().then((dir) {
+  //     return join(dir!.path, "Spotube");
+  //   });
+  // }
 
   Future<void> setData(PreferencesTableCompanion data) async {
-    final db = ref.read(databaseProvider);
-
     final query = db.update(db.preferencesTable)..where((t) => t.id.equals(0));
 
     await query.write(data);
   }
 
   Future<void> reset() async {
-    final db = ref.read(databaseProvider);
-
     final query = db.update(db.preferencesTable);
 
     await query.replace(PreferencesTableCompanion.insert(id: const Value(0)));
