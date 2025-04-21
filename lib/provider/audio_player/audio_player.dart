@@ -10,7 +10,7 @@ import 'package:spotube/extensions/track.dart';
 import 'package:spotube/models/database/database.dart';
 import 'package:spotube/models/local_track.dart';
 import 'package:spotube/provider/audio_player/state.dart';
-import 'package:spotube/provider/blacklist_provider.dart';
+import 'package:spotube/provider/blacklist/blacklist_provider.dart';
 import 'package:spotube/provider/discord_provider.dart';
 import 'package:spotube/provider/server/sourced_track.dart';
 import 'package:spotube/services/audio_player/audio_player.dart';

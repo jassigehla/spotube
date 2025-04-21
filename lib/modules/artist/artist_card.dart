@@ -10,7 +10,7 @@ import 'package:spotube/components/image/universal_image.dart';
 import 'package:spotube/extensions/context.dart';
 import 'package:spotube/extensions/image.dart';
 
-import 'package:spotube/provider/blacklist_provider.dart';
+import 'package:spotube/provider/blacklist/blacklist_provider.dart';
 
 class ArtistCard extends HookConsumerWidget {
   final Artist artist;

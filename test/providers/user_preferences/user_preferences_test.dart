@@ -32,7 +32,7 @@ void main() {
       getIt.registerSingleton<SpotubeAudioPlayer>(MockSpotubeAudioPlayer());
       getIt.registerSingleton<KVStoreService>(MockKVStoreService());
       getIt.registerSingleton<WindowManager>(mockWindowManager);
-      getIt.registerLazySingleton(
+      getIt.registerLazySingleton<AppDatabase>(
         () {
           final database = AppDatabase(NativeDatabase.memory());
 
@@ -69,8 +69,12 @@ void main() {
       getIt.reset();
     });
 
-    test('Initial value should be equal the default values', () {
+    test('Initial value should be equal the default values', () async {
+      when(() => audioPlayer.setAudioNormalization(any()))
+          .thenAnswer((_) async {});
+
       final preferences = container.read(userPreferencesProvider);
+      await Future.delayed(const Duration(milliseconds: 500));
       final defaultPreferences = PreferencesTable.defaults();
 
       expect(preferences, defaultPreferences);

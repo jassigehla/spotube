@@ -65,12 +65,12 @@ Future<void> main(List<String> rawArgs) async {
 
   AppLogger.runZoned(() async {
     final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+    MediaKit.ensureInitialized();
 
-    getIt.registerSingleton(await SharedPreferences.getInstance());
-    getIt.registerSingletonWithDependencies(
-      () => KVStoreService.init(),
-      dependsOn: [SharedPreferences],
+    getIt.registerSingleton<SharedPreferences>(
+      await SharedPreferences.getInstance(),
     );
+    getIt.registerSingleton(KVStoreService.init());
     getIt.registerLazySingleton<AppDatabase>(() => AppDatabase());
     getIt.registerSingleton(SpotubeAudioPlayer());
     getIt.registerSingleton<WindowManager>(windowManager);
@@ -80,8 +80,6 @@ Future<void> main(List<String> rawArgs) async {
     tz.initializeTimeZones();
 
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-
-    MediaKit.ensureInitialized();
 
     await migrateMacOsFromSandboxToNoSandbox();
 
