@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spotify/spotify.dart';
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/models/database/database.dart';
-import 'package:spotube/provider/database/database.dart';
 import 'package:spotube/provider/youtube_engine/youtube_engine.dart';
 import 'package:spotube/services/logger/logger.dart';
 import 'package:spotube/services/song_link/song_link.dart';
@@ -66,7 +66,7 @@ class YoutubeSourcedTrack extends SourcedTrack {
       return sourcedTrack;
     }
 
-    final database = ref.read(databaseProvider);
+    final database = getIt.get<AppDatabase>();
     final cachedSource = await (database.select(database.sourceMatchTable)
           ..where((s) => s.trackId.equals(track.id!))
           ..limit(1)
@@ -261,8 +261,8 @@ class YoutubeSourcedTrack extends SourcedTrack {
                   .where((item) => item.isNotEmpty);
               // Single word and duration match with 3 second tolerance
               if (ytWords.any((word) => spWords.contains(word)) &&
-                  (videoInfo.duration - track.duration!)
-                      .abs().inMilliseconds <= 3000) {
+                  (videoInfo.duration - track.duration!).abs().inMilliseconds <=
+                      3000) {
                 return videoInfo;
               }
               return null;
@@ -356,7 +356,7 @@ class YoutubeSourcedTrack extends SourcedTrack {
         .read(youtubeEngineProvider)
         .getStreamManifest(newSourceInfo.id);
 
-    final database = ref.read(databaseProvider);
+    final database = getIt.get<AppDatabase>();
 
     await database.into(database.sourceMatchTable).insert(
           SourceMatchTableCompanion.insert(

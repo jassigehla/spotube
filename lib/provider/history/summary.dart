@@ -4,8 +4,8 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/models/database/database.dart';
-import 'package:spotube/provider/database/database.dart';
 
 class PlaybackHistorySummary {
   final Duration duration;
@@ -47,7 +47,7 @@ class PlaybackHistorySummaryNotifier
     extends AsyncNotifier<PlaybackHistorySummary> {
   @override
   build() async {
-    final database = ref.watch(databaseProvider);
+    final database = getIt.get<AppDatabase>();
 
     final uniqItemIdCountingCol =
         database.historyTable.itemId.count(distinct: true);

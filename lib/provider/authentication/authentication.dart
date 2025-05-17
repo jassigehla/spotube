@@ -11,10 +11,10 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart'
     hide X509Certificate;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:spotube/collections/routes.dart';
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/components/dialogs/prompt_dialog.dart';
 import 'package:spotube/extensions/context.dart';
 import 'package:spotube/models/database/database.dart';
-import 'package:spotube/provider/database/database.dart';
 import 'package:spotube/services/logger/logger.dart';
 import 'package:spotube/utils/platform.dart';
 import 'package:otp_util/otp_util.dart';
@@ -51,10 +51,10 @@ class AuthenticationNotifier extends AsyncNotifier<AuthenticationTableData?> {
     return dio;
   }();
 
+  AppDatabase get database => getIt.get<AppDatabase>();
+
   @override
   build() async {
-    final database = ref.watch(databaseProvider);
-
     final data = await (database.select(database.authenticationTable)
           ..where((s) => s.id.equals(0)))
         .getSingleOrNull();
@@ -92,7 +92,6 @@ class AuthenticationNotifier extends AsyncNotifier<AuthenticationTableData?> {
   }
 
   Future<void> refreshCredentials() async {
-    final database = ref.read(databaseProvider);
     final refreshedCredentials =
         await credentialsFromCookie(state.asData!.value!.cookie.value);
 
@@ -102,7 +101,6 @@ class AuthenticationNotifier extends AsyncNotifier<AuthenticationTableData?> {
   }
 
   Future<void> login(String cookie) async {
-    final database = ref.read(databaseProvider);
     final refreshedCredentials = await credentialsFromCookie(cookie);
 
     await database
@@ -289,7 +287,6 @@ class AuthenticationNotifier extends AsyncNotifier<AuthenticationTableData?> {
 
   Future<void> logout() async {
     state = const AsyncData(null);
-    final database = ref.read(databaseProvider);
     await (database.delete(database.authenticationTable)
           ..where((s) => s.id.equals(0)))
         .go();

@@ -1,5 +1,5 @@
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/models/database/database.dart';
-import 'package:spotube/provider/database/database.dart';
 import 'package:spotube/services/logger/logger.dart';
 import 'package:dio/dio.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -17,7 +17,7 @@ class SourcedSegments {
 
 Future<List<SkipSegmentTableData>> getAndCacheSkipSegments(
     String id, Ref ref) async {
-  final database = ref.read(databaseProvider);
+  final database = getIt.get<AppDatabase>();
   try {
     final cached = await (database.select(database.skipSegmentTable)
           ..where((s) => s.trackId.equals(id)))

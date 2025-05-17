@@ -3,8 +3,8 @@ import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:piped_client/piped_client.dart';
 import 'package:spotify/spotify.dart';
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/models/database/database.dart';
-import 'package:spotube/provider/database/database.dart';
 import 'package:spotube/provider/user_preferences/user_preferences_provider.dart';
 
 import 'package:spotube/services/sourced_track/enums.dart';
@@ -63,7 +63,7 @@ class PipedSourcedTrack extends SourcedTrack {
       );
     }
 
-    final database = ref.read(databaseProvider);
+    final database = getIt.get<AppDatabase>();
     final cachedSource = await (database.select(database.sourceMatchTable)
           ..where((s) => s.trackId.equals(track.id!))
           ..limit(1)
@@ -287,7 +287,7 @@ class PipedSourcedTrack extends SourcedTrack {
 
     final manifest = await pipedClient.streams(newSourceInfo.id);
 
-    final database = ref.read(databaseProvider);
+    final database = getIt.get<AppDatabase>();
     await database.into(database.sourceMatchTable).insert(
           SourceMatchTableCompanion.insert(
             trackId: id!,

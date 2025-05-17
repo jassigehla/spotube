@@ -23,6 +23,14 @@ class SpotubeColor extends Color {
   String toString() {
     return "$name:${toARGB32()}";
   }
+
+  @override
+  operator ==(Object other) {
+    return other is SpotubeColor && other.value == value && other.name == name;
+  }
+
+  @override
+  int get hashCode => Object.hashAll([value, name]);
 }
 
 final Set<SpotubeColor> colorsMap = {

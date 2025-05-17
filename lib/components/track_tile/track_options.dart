@@ -25,7 +25,7 @@ import 'package:spotube/extensions/image.dart';
 import 'package:spotube/models/database/database.dart';
 import 'package:spotube/models/local_track.dart';
 import 'package:spotube/provider/authentication/authentication.dart';
-import 'package:spotube/provider/blacklist_provider.dart';
+import 'package:spotube/provider/blacklist/blacklist_provider.dart';
 import 'package:spotube/provider/download_manager_provider.dart';
 import 'package:spotube/provider/local_tracks/local_tracks_provider.dart';
 import 'package:spotube/provider/audio_player/audio_player.dart';

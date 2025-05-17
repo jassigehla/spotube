@@ -23,7 +23,7 @@ import 'package:spotube/extensions/image.dart';
 import 'package:spotube/models/local_track.dart';
 import 'package:spotube/provider/audio_player/querying_track_info.dart';
 import 'package:spotube/provider/audio_player/state.dart';
-import 'package:spotube/provider/blacklist_provider.dart';
+import 'package:spotube/provider/blacklist/blacklist_provider.dart';
 import 'package:spotube/utils/platform.dart';
 
 class TrackTile extends HookConsumerWidget {

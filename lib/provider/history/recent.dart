@@ -2,13 +2,13 @@ import 'dart:convert';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/models/database/database.dart';
-import 'package:spotube/provider/database/database.dart';
 
 class RecentlyPlayedItemNotifier extends AsyncNotifier<List<HistoryTableData>> {
   @override
   build() async {
-    final database = ref.watch(databaseProvider);
+    final database = getIt.get<AppDatabase>();
 
     final query = database.customSelect(
       """

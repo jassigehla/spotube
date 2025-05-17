@@ -7,11 +7,12 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:html/dom.dart' hide Text;
 import 'package:shadcn_flutter/shadcn_flutter.dart' hide Element;
 import 'package:spotify/spotify.dart';
+import 'package:spotube/collections/vars.dart';
+import 'package:spotube/models/database/database.dart';
 import 'package:spotube/pages/library/user_local_tracks/user_local_tracks.dart';
 import 'package:spotube/modules/root/update_dialog.dart';
 
 import 'package:spotube/models/lyrics.dart';
-import 'package:spotube/provider/database/database.dart';
 import 'package:spotube/services/dio/dio.dart';
 import 'package:spotube/services/logger/logger.dart';
 import 'package:spotube/services/sourced_track/sourced_track.dart';
@@ -333,7 +334,7 @@ abstract class ServiceUtils {
     WidgetRef ref,
   ) async {
     if (!Env.enableUpdateChecker) return;
-    final database = ref.read(databaseProvider);
+    final database = getIt.get<AppDatabase>();
     final checkUpdate = await (database.selectOnly(database.preferencesTable)
           ..addColumns([database.preferencesTable.checkUpdate])
           ..where(database.preferencesTable.id.equals(0)))

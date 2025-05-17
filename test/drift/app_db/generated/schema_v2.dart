@@ -2,6 +2,10 @@
 // GENERATED CODE, DO NOT EDIT BY HAND.
 // ignore_for_file: type=lint
 import 'package:drift/drift.dart';
+import 'package:flutter/material.dart' show ThemeMode;
+import 'package:spotify/spotify.dart';
+import 'package:spotube/models/database/database.dart';
+import 'package:spotube/services/sourced_track/enums.dart';
 
 class AuthenticationTable extends Table
     with TableInfo<AuthenticationTable, AuthenticationTableData> {

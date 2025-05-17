@@ -103,7 +103,7 @@ class YouTubeEngineNotInstalledDialog extends HookConsumerWidget {
                     ?.invalidate(context.l10n.file_not_found);
                 return;
               }
-              await KVStoreService.setYoutubeEnginePath(
+              await KVStoreService().setYoutubeEnginePath(
                 engine,
                 controller.text,
               );

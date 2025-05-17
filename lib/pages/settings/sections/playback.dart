@@ -298,7 +298,8 @@ class SettingsPlaybackSection extends HookConsumerWidget {
               onChanged: (value) async {
                 if (value == null) return;
                 if (value == YoutubeClientEngine.ytDlp) {
-                  final customPath = KVStoreService.getYoutubeEnginePath(value);
+                  final customPath =
+                      KVStoreService().getYoutubeEnginePath(value);
                   if (!await YtDlpEngine.isInstalled() &&
                       (customPath == null ||
                           !await File(customPath).exists()) &&

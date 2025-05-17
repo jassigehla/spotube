@@ -4,13 +4,13 @@ import 'package:drift/drift.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:media_kit/media_kit.dart' hide Track;
 import 'package:spotify/spotify.dart' hide Playlist;
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/extensions/list.dart';
 import 'package:spotube/extensions/track.dart';
 import 'package:spotube/models/database/database.dart';
 import 'package:spotube/models/local_track.dart';
 import 'package:spotube/provider/audio_player/state.dart';
-import 'package:spotube/provider/blacklist_provider.dart';
-import 'package:spotube/provider/database/database.dart';
+import 'package:spotube/provider/blacklist/blacklist_provider.dart';
 import 'package:spotube/provider/discord_provider.dart';
 import 'package:spotube/provider/server/sourced_track.dart';
 import 'package:spotube/services/audio_player/audio_player.dart';
@@ -20,7 +20,7 @@ class AudioPlayerNotifier extends Notifier<AudioPlayerState> {
   BlackListNotifier get _blacklist => ref.read(blacklistProvider.notifier);
 
   Future<void> _syncSavedState() async {
-    final database = ref.read(databaseProvider);
+    final database = getIt.get<AppDatabase>();
 
     var playerState =
         await database.select(database.audioPlayerStateTable).getSingleOrNull();
@@ -102,7 +102,7 @@ class AudioPlayerNotifier extends Notifier<AudioPlayerState> {
   Future<void> _updatePlayerState(
     AudioPlayerStateTableCompanion companion,
   ) async {
-    final database = ref.read(databaseProvider);
+    final database = getIt.get<AppDatabase>();
 
     await (database.update(database.audioPlayerStateTable)
           ..where((tb) => tb.id.equals(0)))
@@ -112,7 +112,7 @@ class AudioPlayerNotifier extends Notifier<AudioPlayerState> {
   Future<void> _updatePlaylist(
     Playlist playlist,
   ) async {
-    final database = ref.read(databaseProvider);
+    final database = getIt.get<AppDatabase>();
 
     await database.batch((batch) {
       batch.update(

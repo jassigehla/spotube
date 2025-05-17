@@ -14,11 +14,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:local_notifier/local_notifier.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:metadata_god/metadata_god.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smtc_windows/smtc_windows.dart';
 import 'package:spotube/collections/env.dart';
 import 'package:spotube/collections/initializers.dart';
 import 'package:spotube/collections/intents.dart';
 import 'package:spotube/collections/routes.dart';
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/hooks/configurators/use_close_behavior.dart';
 import 'package:spotube/hooks/configurators/use_deep_linking.dart';
 import 'package:spotube/hooks/configurators/use_disable_battery_optimizations.dart';
@@ -28,7 +30,6 @@ import 'package:spotube/hooks/configurators/use_has_touch.dart';
 import 'package:spotube/models/database/database.dart';
 import 'package:spotube/modules/settings/color_scheme_picker_dialog.dart';
 import 'package:spotube/provider/audio_player/audio_player_streams.dart';
-import 'package:spotube/provider/database/database.dart';
 import 'package:spotube/provider/glance/glance.dart';
 import 'package:spotube/provider/server/bonsoir.dart';
 import 'package:spotube/provider/server/server.dart';
@@ -64,14 +65,21 @@ Future<void> main(List<String> rawArgs) async {
 
   AppLogger.runZoned(() async {
     final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+    MediaKit.ensureInitialized();
+
+    getIt.registerSingleton<SharedPreferences>(
+      await SharedPreferences.getInstance(),
+    );
+    getIt.registerSingleton(KVStoreService.init());
+    getIt.registerLazySingleton<AppDatabase>(() => AppDatabase());
+    getIt.registerSingleton(SpotubeAudioPlayer());
+    getIt.registerSingleton<WindowManager>(windowManager);
 
     await registerWindowsScheme("spotify");
 
     tz.initializeTimeZones();
 
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-
-    MediaKit.ensureInitialized();
 
     await migrateMacOsFromSandboxToNoSandbox();
 
@@ -85,13 +93,11 @@ Future<void> main(List<String> rawArgs) async {
       MetadataGod.initialize();
     }
 
-    await KVStoreService.initialize();
-
     if (kIsDesktop) {
       await windowManager.setPreventClose(true);
       await YtDlp.instance
           .setBinaryLocation(
-            KVStoreService.getYoutubeEnginePath(YoutubeClientEngine.ytDlp) ??
+            KVStoreService().getYoutubeEnginePath(YoutubeClientEngine.ytDlp) ??
                 "yt-dlp${kIsWindows ? '.exe' : ''}",
           )
           .catchError((e, stack) => null);
@@ -104,8 +110,6 @@ Future<void> main(List<String> rawArgs) async {
 
     await EncryptedKvStoreService.initialize();
 
-    final database = AppDatabase();
-
     if (kIsDesktop) {
       await localNotifier.setup(appName: "Spotube");
       await WindowManagerTools.initialize();
@@ -116,14 +120,11 @@ Future<void> main(List<String> rawArgs) async {
     }
 
     runApp(
-      ProviderScope(
-        overrides: [
-          databaseProvider.overrideWith((ref) => database),
-        ],
-        observers: const [
+      const ProviderScope(
+        observers: [
           AppLoggerProviderObserver(),
         ],
-        child: const Spotube(),
+        child: Spotube(),
       ),
     );
   });

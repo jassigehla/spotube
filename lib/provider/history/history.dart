@@ -1,11 +1,11 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:spotify/spotify.dart';
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/models/database/database.dart';
-import 'package:spotube/provider/database/database.dart';
 
 class PlaybackHistoryActions {
   final Ref ref;
-  AppDatabase get _db => ref.read(databaseProvider);
+  AppDatabase get _db => getIt.get<AppDatabase>();
 
   PlaybackHistoryActions(this.ref);
 

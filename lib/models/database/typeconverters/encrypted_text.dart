@@ -16,7 +16,7 @@ class DecryptedText {
     return DecryptedText(
       _encrypter!.decrypt(
         Encrypted.fromBase64(value),
-        iv: KVStoreService.ivKey,
+        iv: KVStoreService().ivKey,
       ),
     );
   }
@@ -27,7 +27,7 @@ class DecryptedText {
         Key.fromUtf8(EncryptedKvStoreService.encryptionKeySync),
       ),
     );
-    return _encrypter!.encrypt(value, iv: KVStoreService.ivKey).base64;
+    return _encrypter!.encrypt(value, iv: KVStoreService().ivKey).base64;
   }
 }
 

@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spotify/spotify.dart';
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/models/database/database.dart';
-import 'package:spotube/provider/database/database.dart';
 import 'package:spotube/services/sourced_track/enums.dart';
 import 'package:spotube/services/sourced_track/exceptions.dart';
 import 'package:spotube/services/sourced_track/models/source_info.dart';
@@ -41,7 +41,7 @@ class JioSaavnSourcedTrack extends SourcedTrack {
     required Ref ref,
     bool weakMatch = false,
   }) async {
-    final database = ref.read(databaseProvider);
+    final database = getIt.get<AppDatabase>();
     final cachedSource = await (database.select(database.sourceMatchTable)
           ..where((s) => s.trackId.equals(track.id!))
           ..limit(1)
@@ -214,7 +214,7 @@ class JioSaavnSourcedTrack extends SourcedTrack {
 
     final (:info, :source) = toSiblingType(item);
 
-    final database = ref.read(databaseProvider);
+    final database = getIt.get<AppDatabase>();
     await database.into(database.sourceMatchTable).insert(
           SourceMatchTableCompanion.insert(
             trackId: id!,

@@ -25,7 +25,7 @@ abstract class EncryptedKvStoreService {
 
   static Future<String> get encryptionKey async {
     if (isUnsupportedPlatform) {
-      return KVStoreService.encryptionKey;
+      return KVStoreService().encryptionKey;
     }
     try {
       final value = await _storage.read(key: 'encryption');
@@ -38,20 +38,20 @@ abstract class EncryptedKvStoreService {
 
       return value;
     } catch (e) {
-      return KVStoreService.encryptionKey;
+      return KVStoreService().encryptionKey;
     }
   }
 
   static Future<void> setEncryptionKey(String key) async {
     if (isUnsupportedPlatform) {
-      await KVStoreService.setEncryptionKey(key);
+      await KVStoreService().setEncryptionKey(key);
       return;
     }
 
     try {
       await _storage.write(key: 'encryption', value: key);
     } catch (e) {
-      await KVStoreService.setEncryptionKey(key);
+      await KVStoreService().setEncryptionKey(key);
     } finally {
       _encryptionKeySync = key;
     }

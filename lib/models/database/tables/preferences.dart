@@ -137,7 +137,7 @@ class PreferencesTable extends Table {
       market: Market.US,
       searchMode: SearchMode.youtube,
       downloadLocation: "",
-      localLibraryLocation: [],
+      localLibraryLocation: const [],
       pipedInstance: "https://pipedapi.kavin.rocks",
       invidiousInstance: "https://inv.nadeko.net",
       themeMode: ThemeMode.system,

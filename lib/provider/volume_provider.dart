@@ -9,16 +9,17 @@ class VolumeProvider extends Notifier<double> {
 
   @override
   build() {
-    audioPlayer.setVolume(KVStoreService.volume);
-    return KVStoreService.volume;
+    audioPlayer.setVolume(KVStoreService().volume);
+    return KVStoreService().volume;
   }
 
   Future<void> setVolume(double volume) async {
     state = volume;
     await audioPlayer.setVolume(volume);
-    KVStoreService.setVolume(volume);
+    await KVStoreService().setVolume(volume);
   }
 }
 
-final volumeProvider =
-    NotifierProvider<VolumeProvider, double>(() => VolumeProvider());
+final volumeProvider = NotifierProvider<VolumeProvider, double>(() {
+  return VolumeProvider();
+});

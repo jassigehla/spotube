@@ -123,7 +123,7 @@ class SyncedLyricsNotifier extends FamilyAsyncNotifier<SubtitleSimple, Track?> {
   @override
   FutureOr<SubtitleSimple> build(track) async {
     try {
-      final database = ref.watch(databaseProvider);
+      final database = getIt.get<AppDatabase>();
       final spotify = ref.watch(spotifyProvider);
       final auth = await ref.watch(authenticationProvider.future);
 

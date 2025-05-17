@@ -30,7 +30,7 @@ class AppRouter extends RootStackRouter {
                   (resolver, router) async {
                     final auth = await ref.read(authenticationProvider.future);
 
-                    if (auth == null && !KVStoreService.doneGettingStarted) {
+                    if (auth == null && !KVStoreService().doneGettingStarted) {
                       resolver.redirect(const GettingStartedRoute());
                     } else {
                       resolver.next(true);

@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:spotify/spotify.dart';
+import 'package:spotube/collections/vars.dart';
 import 'package:spotube/models/database/database.dart';
-import 'package:spotube/provider/database/database.dart';
 import 'package:spotube/provider/history/top.dart';
 import 'package:spotube/provider/spotify/spotify.dart';
 
@@ -64,7 +64,7 @@ class HistoryTopTracksNotifier extends FamilyPaginatedAsyncNotifier<
 
   SimpleSelectStatement<$HistoryTableTable, HistoryTableData>
       createTracksQuery() {
-    final database = ref.read(databaseProvider);
+    final database = getIt.get<AppDatabase>();
 
     return database.select(database.historyTable)
       ..where(
